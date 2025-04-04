@@ -282,9 +282,10 @@ const CreateOrder: React.FC = () => {
                                         const product = products.find(p => p.id === +value);
                                         if (product) {
                                             addToCart(product);
-                                            form.setFieldsValue({ products: '' });
+                                            form.setFieldsValue({ products: "Chọn sản phẩm" });
                                         }
                                     }}
+                                    className='[&_span]:text-[rgba(0,0,0,0.25)]'
                                     placeholder="Chọn sản phẩm"
                                     style={{ width: '100%' }}
                                     options={products.map(product => ({
