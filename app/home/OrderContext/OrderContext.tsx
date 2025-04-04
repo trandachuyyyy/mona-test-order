@@ -25,18 +25,6 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = React.memo(({ ch
         customerPayment: 0,
     });
 
-    const calculateTotal = useMemo(() => () => {
-        return order.cart.reduce((total, item) => {
-            let itemTotal = item.price * item.quantity;
-            if (item.promo) {
-                itemTotal = item.promo.type === 'fixed'
-                    ? itemTotal - item.promo.value
-                    : itemTotal * (1 - item.promo.value / 100);
-            }
-            return total + Math.max(itemTotal, 0);
-        }, 0);
-    }, [order.cart]);
-
     const updateCustomerInfo = (field: keyof Pick<Order, 'customerName' | 'email' | 'phone'>, value: string) => {
         setOrder(prev => ({ ...prev, [field]: value }));
     };
@@ -62,8 +50,6 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = React.memo(({ ch
         });
     };
 
-
-
     const updateCart = (index: number, field: keyof CartItem, value: any) => {
         setOrder(prev => {
             const newCart = [...prev.cart];
@@ -86,6 +72,18 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = React.memo(({ ch
     const setCustomerPayment = (amount: number) => {
         setOrder(prev => ({ ...prev, customerPayment: amount }));
     };
+
+    const calculateTotal = useMemo(() => () => {
+        return order.cart.reduce((total, item) => {
+            let itemTotal = item.price * item.quantity;
+            if (item.promo) {
+                itemTotal = item.promo.type === 'fixed'
+                    ? itemTotal - item.promo.value
+                    : itemTotal * (1 - item.promo.value / 100);
+            }
+            return total + Math.max(itemTotal, 0);
+        }, 0);
+    }, [order.cart]);
 
     const value = useMemo(() => ({
         order,
