@@ -5,6 +5,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Button, InputNumber, List, Select } from 'antd';
 import React, { memo } from 'react';
 import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CartWrapper = styled.div`
   display: flex;
@@ -56,7 +57,7 @@ const Total = styled.div`
   text-align: right;
 `;
 
-const CartItem = styled(List.Item)`
+const MotionCartItem = styled(motion(List.Item))`
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
 
@@ -138,66 +139,75 @@ const CartList: React.FC = memo(() => {
   return (
     <CartWrapper>
       <ScrollableList>
-        <List
-          dataSource={order.cart}
-          renderItem={(item, index) => (
-            <CartItem>
-              <div className="cart-item-wrapper">
-                <ProductImage src={item.image} alt={item.name} />
-                <div style={{ flex: 1 }}>
-                  <div>{item.name}</div>
-                  <div className="cart-item-controls">
-                    <InputNumber
-                      min={0}
-                      value={item.price}
-                      onChange={value => updateCart(index, 'price', Number(value))}
-                      formatter={value =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                      }
-                    />
-                    <InputNumber
-                      min={1}
-                      value={item.quantity}
-                      onChange={value => updateCart(index, 'quantity', Number(value))}
-                    />
-                    <Select
-                      allowClear
-                      placeholder="Mã khuyến mãi"
-                      style={{ width: 150 }}
-                      onChange={value =>
-                        updateCart(
-                          index,
-                          'promo',
-                          promoCodes.find(p => p.code === value) || null
-                        )
-                      }
-                    >
-                      {promoCodes.map(promo => (
-                        <Select.Option key={promo.code} value={promo.code}>
-                          {promo.code}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                    <Button
-                      className="delete-btn-mobile"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => removeFromCart(index)}
-                    />
+        <AnimatePresence mode="popLayout">
+          <List
+            dataSource={order.cart}
+            renderItem={(item, index) => (
+              <MotionCartItem
+                key={item.id}
+                layout
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8, height: 0, margin: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="cart-item-wrapper">
+                  <ProductImage src={item.image} alt={item.name} />
+                  <div style={{ flex: 1 }}>
+                    <div>{item.name}</div>
+                    <div className="cart-item-controls">
+                      <InputNumber
+                        min={0}
+                        value={item.price}
+                        onChange={value => updateCart(index, 'price', Number(value))}
+                        formatter={value =>
+                          `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        }
+                      />
+                      <InputNumber
+                        min={1}
+                        value={item.quantity}
+                        onChange={value => updateCart(index, 'quantity', Number(value))}
+                      />
+                      <Select
+                        allowClear
+                        placeholder="Mã khuyến mãi"
+                        style={{ width: 150 }}
+                        onChange={value =>
+                          updateCart(
+                            index,
+                            'promo',
+                            promoCodes.find(p => p.code === value) || null
+                          )
+                        }
+                      >
+                        {promoCodes.map(promo => (
+                          <Select.Option key={promo.code} value={promo.code}>
+                            {promo.code}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                      <Button
+                        className="delete-btn-mobile"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => removeFromCart(index)}
+                      />
 
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="delete-btn-desktop">
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => removeFromCart(index)}
-                />
-              </div>
-            </CartItem>
-          )}
-        />
+                <div className="delete-btn-desktop">
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeFromCart(index)}
+                  />
+                </div>
+              </MotionCartItem>
+            )}
+          />
+        </AnimatePresence>
       </ScrollableList>
 
       <Total>Tổng tiền: {calculateTotal().toLocaleString()} ₫</Total>
